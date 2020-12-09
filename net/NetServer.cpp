@@ -6,18 +6,23 @@
 #include <memory.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <malloc.h>
 
 //=================================================
 EpollIo::EpollIo(int maxEvent)
 {
     m_epfd = epoll_create(maxEvent);
-    assert( m_epfd > 0);
+    pEvents = (epoll_event*)malloc(sizeof(epoll_event)*maxEvent );
+    assert( m_epfd > 0 && pEvents != nullptr);
     m_maxEvent = maxEvent;
 }
 
 EpollIo::~EpollIo() 
 {
     close(m_epfd);
+    m_epfd = INVALID_FD;
+    free(pEvents);
+    pEvents = nullptr;
 }
 
 int EpollIo::Mod(int fd,epoll_event* ev)
@@ -34,14 +39,12 @@ int EpollIo::Del(int fd)
 {
     return epoll_ctl(m_epfd,EPOLL_CTL_DEL,fd,nullptr);
 }
-void EpollIo::Loop(int timeOut)
+
+void EpollIo::Wait(int timeOut)
 {
-    epoll_event evs[m_maxEvent] = {0};
-    for(;;){
-        int count = epoll_wait(m_epfd,evs,m_maxEvent,timeOut);
-        for (int i = 0; i < count; i++) {
-            ((IEpEvent*)evs[i].data.ptr)->DoEpEvent(evs[i].events);
-        }
+    int count = epoll_wait(m_epfd,pEvents,m_maxEvent,timeOut);
+    for (int i = 0; i < count; i++) {
+        ((IEpEvent*)pEvents[i].data.ptr)->DoEpEvent(pEvents[i].events);
     }
 }
 //=================================================
@@ -105,7 +108,6 @@ bool Listener::StartListen()
     m_pEpoll->Add(m_fd, &m_ev);
     return true;
  }
- 
 //=================================================
 Session::Session(short idex,EpollIo* pEpoll)
 {
@@ -151,6 +153,7 @@ void Session::Attch(int fd,int addr,short cycle)
     //注册到epoll
     m_pEpoll->Add(m_fd,&m_ev);
 }
+
 void Session::Reset()
 {
     //删除epoll
@@ -173,6 +176,7 @@ bool Session::Send(void* buf,int size) {
         m_ev.events |= EPOLLOUT;
         m_pEpoll->Mod(m_fd,&m_ev);
     }
+    return true;
 }
 
 
@@ -228,5 +232,7 @@ void NetServer::Listene(int fd,int addr)
 void NetServer::run(int timeOut)
 {
     m_pListener.StartListen();
-    m_Io.Loop(timeOut);
+    for(;;) {
+        m_Io.Wait(timeOut);
+    }
 }
