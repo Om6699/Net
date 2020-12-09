@@ -18,13 +18,15 @@ class IEpEvent{
     public:
         virtual void DoEpEvent(int evType) = 0; 
 };
+
 //=================================================
 class NetServer;
 class EpollIo {
     friend NetServer;
 private:
-    int m_maxEvent;
     int m_epfd;
+    epoll_event* pEvents;
+    int m_maxEvent;
 public:
     EpollIo(int maxEvent);
     ~EpollIo();
@@ -34,7 +36,7 @@ public:
     int Add(int fd,epoll_event* ev);
     int Del(int fd);
 protected:
-    void Loop(int timeOut);
+    void Wait(int timeOut);
 };
 //=================================================
 class IListeneSink {
@@ -59,7 +61,6 @@ public:
 protected:
     bool SetNonBlock(int fd);
 };
-//=================================================
 //=================================================
 class Session : public IEpEvent {
     friend NetServer;
