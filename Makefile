@@ -8,7 +8,7 @@ TARGET=$(patsubst %.cpp, %, $(NAME))
 $(TARGET):$(OBJS)
 	$(CC) -o $@ $^ $(FLAG)
 
-%.o:%.c
+%.o:%.cpp
 	$(CC) -o $@ -c $< -g
 
 clean:
