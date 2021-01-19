@@ -1,6 +1,5 @@
-#include "net/NetServer.h"
+#include "Service/NetService.h"
 #include <iostream>
-
 
 int main(int argc, char* argv[])
 {
@@ -8,7 +7,7 @@ int main(int argc, char* argv[])
         std::cout << "缺少参数" << std::endl;
         return 0;
     }
-    NetServer server(2000,std::atoi(argv[1]));
+    NetService server(2000,std::atoi(argv[1]));
     server.run();
     return 0;
 }
