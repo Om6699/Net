@@ -8,7 +8,7 @@ struct BufferNode
     int mIndex;
     int mSize;
 };
-typedef std::map<int,std::list<BufferNode>> NodeMap;
+typedef std::map<unsigned long long,std::list<BufferNode>> NodeMap;
 class RingBuffer
 {
 private:
@@ -22,8 +22,8 @@ public:
     RingBuffer(int buffSize);
     ~RingBuffer();
 public:
-    bool Write(int identifier,void* pdata,int dataSize);
-    int  Read(int identifier,void* pdata,int dataBuffSize);
+    bool Write(unsigned long long identifier,void* pdata,int dataSize);
+    int  Read(unsigned long long identifier,void* pdata,int dataBuffSize);
 };
 
 #endif

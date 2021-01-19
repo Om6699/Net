@@ -41,9 +41,9 @@ void NetService::run(int timeOut)
 
 bool NetService::SendData(SessionID sid,void* pdata,int size)
 {
-    if(sid.Sun.index < 0 || sid.Sun.index >= (short)m_SessionVec.size())
+    if(sid.sct.index < 0 || sid.sct.index >= (short)m_SessionVec.size())
         return false;
-    Session* pSession = m_SessionVec[sid.Sun.index];
+    Session* pSession = m_SessionVec[sid.sct.index];
     if(!pSession) 
         return false;
     return pSession->Send(pdata,size);

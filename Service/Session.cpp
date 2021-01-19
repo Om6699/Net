@@ -12,7 +12,7 @@ Session::Session(short idex,EpollIo* pEpoll,RingBuffer* pBuff)
     m_addr = 0;
     m_pEpoll = pEpoll;
     m_pSendBuffer = pBuff;
-    m_Sid.Sun.sid = INVALID_SESSIONID;
+    m_Sid.sid = INVALID_SESSIONID;
 }
 
 
@@ -40,9 +40,10 @@ void Session::Attch(int fd,int addr,ushort cycle)
     m_addr = addr;
     m_cycle = cycle;
     //
-    m_Sid.Sun.fd = m_fd;
-    m_Sid.Sun.index = m_idex;
-    m_Sid.Sun.cycle = m_cycle;
+    m_Sid.sct.fd = m_fd;
+    m_Sid.sct.index = m_idex;
+    m_Sid.sct.cycle = m_cycle;
+
     //设置监听事件
     memset(&m_ev,0,sizeof(epoll_event));
     m_ev.data.fd = m_fd;
@@ -62,14 +63,14 @@ void Session::Reset()
     m_addr = 0;
     m_cycle = 0;
     //
-    m_Sid.Sun.sid = INVALID_SESSIONID;
+    m_Sid.sid = INVALID_SESSIONID;
 
 }
 
 bool Session::Send(void* pdata,int size) 
 {
     //数据缓存
-    if(m_pSendBuffer->Write(m_Sid.Sun.sid,pdata,size))
+    if(m_pSendBuffer->Write(m_Sid.sid,pdata,size))
     {
         //修改监听事件
         if(!(m_ev.events & EPOLLOUT)) 
@@ -95,7 +96,7 @@ void Session::DoRecv() {
 void Session::DoSend() 
 {
     char buff[SESSIONBUFFSIZE]={0};
-    int size = m_pSendBuffer->Read(m_Sid.Sun.sid,(void*)buff,sizeof(buff));
+    int size = m_pSendBuffer->Read(m_Sid.sid,(void*)buff,sizeof(buff));
     if(size > 0)
     {
         write(m_fd,buff,size);

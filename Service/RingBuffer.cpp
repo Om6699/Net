@@ -21,7 +21,7 @@ RingBuffer::~RingBuffer()
 }
 
 
-bool RingBuffer::Write(int identifier,void* pdata,int dataSize)
+bool RingBuffer::Write(unsigned long long identifier,void* pdata,int dataSize)
 {
     //
     int remainSize = mTotalSize - mUseSize;
@@ -51,7 +51,7 @@ bool RingBuffer::Write(int identifier,void* pdata,int dataSize)
 }
 
 
-int RingBuffer::Read(int identifier,void* pdata,int dataBuffSize)
+int RingBuffer::Read(unsigned long long identifier,void* pdata,int dataBuffSize)
 {
     auto iter = mNodeMap.find(identifier);
     if(iter == mNodeMap.end()) 

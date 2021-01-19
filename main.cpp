@@ -1,6 +1,6 @@
 #include "Service/NetService.h"
 #include <iostream>
-
+#include "Service/ServiceTypeHead.h"
 int main(int argc, char* argv[])
 {
     if(argc < 2) 
